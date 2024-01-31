@@ -76,44 +76,45 @@ let renderCountry = function (data, className = "") {
   countriesContainer.style.opacity = 1;
 };
 
-let getCountryAndNeighbour = function (country) {
-  // AJAX Call country 1
-  let request = new XMLHttpRequest();
-  request.open("GET", `https://restcountries.com/v3.1/name/${country}`);
+// let getCountryAndNeighbour = function (country) {
+//   // AJAX Call country 1
+//   let request = new XMLHttpRequest();
 
-  request.send();
-  // console.log(request.responseText); // Output :      (nothing)
+//   request.open("GET", `https://restcountries.com/v3.1/name/${country}`);
 
-  request.addEventListener("load", function () {
-    //   console.log(this.responseText);
-    let [data] = JSON.parse(this.responseText);
-    console.log(data);
+//   request.send();
+//   // console.log(request.responseText); // Output :      (nothing)
 
-    // render country 1
-    renderCountry(data);
+//   request.addEventListener("load", function () {
+//     //   console.log(this.responseText);
+//     let [data] = JSON.parse(this.responseText);
+//     console.log(data);
 
-    // Get neighbour country (2)
-    let neighbour = data.borders[0];
-    // console.log(neighbour);
-    // let neighbour = Object.values(data.borders).join(", ");
-    // console.log(neighbour);
+//     // render country 1
+//     renderCountry(data);
 
-    if (!neighbour) return;
+//     // Get neighbour country (2)
+//     let neighbour = data.borders[0];
+//     // console.log(neighbour);
+//     // let neighbour = Object.values(data.borders).join(", ");
+//     // console.log(neighbour);
 
-    // AJAX Call country 2
-    let request2 = new XMLHttpRequest();
-    request2.open("GET", `https://restcountries.com/v3.1/alpha/${neighbour}`);
+//     if (!neighbour) return;
 
-    request2.send();
+//     // AJAX Call country 2
+//     let request2 = new XMLHttpRequest();
+//     request2.open("GET", `https://restcountries.com/v3.1/alpha/${neighbour}`);
 
-    request2.addEventListener("load", function () {
-      // console.log(this.responseText);
-      let [data] = JSON.parse(this.responseText);
-      console.log(data);
-      renderCountry(data, "neighbour");
-    });
-  });
-};
+//     request2.send();
+
+//     request2.addEventListener("load", function () {
+//       // console.log(this.responseText);
+//       let [data] = JSON.parse(this.responseText);
+//       console.log(data);
+//       renderCountry(data, "neighbour");
+//     });
+//   });
+// };
 
 // getCountryAndNeighbour("bharat");
 // getCountryAndNeighbour("usa");
@@ -148,3 +149,60 @@ let getCountryAndNeighbour = function (country) {
 // }, 1000);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//// The modern way to make an AJAX request
+
+// let request = fetch("https://restcountries.com/v3.1/name/bharat");
+// console.log(request);
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+//// Cousuming the promise
+
+// let getCountryData = function (country) {
+//   let request = fetch(`https://restcountries.com/v3.1/name/${country}`); // the fetch API returns a promise
+//   request
+//     .then(function (response) {
+//       console.log(response);
+//       return response.json();
+//     })
+//     .then(function (data) {
+//       console.log(data);
+//       renderCountry(data[0]);
+//     });
+// };
+// let getCountryData = (country) => {
+//   fetch(`https://restcountries.com/v3.1/name/${country}`) // The fetch API returns a promise
+//     .then((response) => response.json()) // The json API returns a promise as well
+//     .then((data) => renderCountry(data[0]));
+// };
+
+// getCountryData("bharat");
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+//// Chaining multiple promises
+
+let getCountryData = (country) => {
+  // Country 1
+  fetch(`https://restcountries.com/v3.1/name/${country}`) // The fetch API returns a promise
+    .then((response) => response.json()) // The json API returns a promise as well
+    .then((data) => {
+      renderCountry(data[0]);
+      let neighbour = data[0].borders[0];
+
+      if (!neighbour) return;
+
+      // Country 2
+      return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`);
+
+      // Don't do it (It is just like the callback hell)
+      // return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`).then(
+      // response.json()
+      // )
+    })
+    .then((response) => response.json())
+    .then((data) => renderCountry(data[0], "neighbour"));
+};
+
+getCountryData("bharat");
+// getCountryData("IRELAND");
