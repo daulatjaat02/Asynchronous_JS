@@ -52,29 +52,29 @@ const countriesContainer = document.querySelector(".countries");
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-let renderCountry = function (data, className = "") {
-  let html = `
-     <article class="country ${className}">
-          <img class="country__img" src="${data.flags?.png}" />
-          <div class="country__data">
-            <h3 class="country__name">${data.name.common}</h3>
-            <h4 class="country__region">${data.region}</h4>
-            <p class="country__row"><span>👫</span>${(
-              +data.population / 10000000
-            ).toFixed(1)}</p>
-         <p class="country__row"><span>🗣️</span>${Object.values(
-           data.languages
-         ).join(", ")}</p>
-        <p class="country__row"><span>💰</span>${
-          Object.values(data.currencies)[0]?.name
-        }</p>
+// let renderCountry = function (data, className = "") {
+//   let html = `
+//      <article class="country ${className}">
+//           <img class="country__img" src="${data.flags?.png}" />
+//           <div class="country__data">
+//             <h3 class="country__name">${data.name.common}</h3>
+//             <h4 class="country__region">${data.region}</h4>
+//             <p class="country__row"><span>👫</span>${(
+//               +data.population / 10000000
+//             ).toFixed(1)}</p>
+//          <p class="country__row"><span>🗣️</span>${Object.values(
+//            data.languages
+//          ).join(", ")}</p>
+//         <p class="country__row"><span>💰</span>${
+//           Object.values(data.currencies)[0]?.name
+//         }</p>
 
-          </div>
-        </article>
-    `;
-  countriesContainer.insertAdjacentHTML("beforeend", html);
-  countriesContainer.style.opacity = 1;
-};
+//           </div>
+//         </article>
+//     `;
+//   countriesContainer.insertAdjacentHTML("beforeend", html);
+//   countriesContainer.style.opacity = 1;
+// };
 
 // let getCountryAndNeighbour = function (country) {
 //   // AJAX Call country 1
@@ -182,27 +182,117 @@ let renderCountry = function (data, className = "") {
 
 //// Chaining multiple promises
 
+// let renderCountry = function (data, className = "") {
+//   let html = `
+//      <article class="country ${className}">
+//           <img class="country__img" src="${data.flags?.png}" />
+//           <div class="country__data">
+//             <h3 class="country__name">${data.name.common}</h3>
+//             <h4 class="country__region">${data.region}</h4>
+//             <p class="country__row"><span>👫</span>${(
+//               +data.population / 10000000
+//             ).toFixed(1)}</p>
+//          <p class="country__row"><span>🗣️</span>${Object.values(
+//            data.languages
+//          ).join(", ")}</p>
+//         <p class="country__row"><span>💰</span>${
+//           Object.values(data.currencies)[0]?.name
+//         }</p>
+
+//           </div>
+//         </article>
+//     `;
+//   countriesContainer.insertAdjacentHTML("beforeend", html);
+//   countriesContainer.style.opacity = 1;
+// };
+
+// let getCountryData = (country) => {
+//   // Country 1
+//   fetch(`https://restcountries.com/v3.1/name/${country}`) // The fetch API returns a promise
+//     .then((response) => response.json()) // The json API returns a promise as well
+//     .then((data) => {
+//       renderCountry(data[0]);
+//       let neighbour = data[0].borders[0];
+
+//       if (!neighbour) return;
+
+//       // Country 2
+//       return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`);
+
+//       // Don't do it (It is just like the callback hell)
+//       // return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`).then(
+//       // response.json()
+//       // )
+//     })
+//     .then((response) => response.json())
+//     .then((data) => renderCountry(data[0], "neighbour"));
+// };
+
+// // getCountryData("bharat");
+// // getCountryData("IRELAND");
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+let renderCountry = function (data, className = "") {
+  let html = `
+     <article class="country ${className}">
+          <img class="country__img" src="${data.flags?.png}" />
+          <div class="country__data">
+            <h3 class="country__name">${data.name.common}</h3>
+            <h4 class="country__region">${data.region}</h4>
+            <p class="country__row"><span>👫</span>${(
+              +data.population / 10000000
+            ).toFixed(1)}</p>
+         <p class="country__row"><span>🗣️</span>${Object.values(
+           data.languages
+         ).join(", ")}</p>
+        <p class="country__row"><span>💰</span>${
+          Object.values(data.currencies)[0]?.name
+        }</p>
+
+          </div>
+        </article>
+    `;
+  countriesContainer.insertAdjacentHTML("beforeend", html);
+  // countriesContainer.style.opacity = 1;
+};
+
+let renderError = function (err) {
+  countriesContainer.insertAdjacentText("beforeend", err);
+  // countriesContainer.style.opacity = 1;
+};
+
+let getJSON = function (url, errorMsg = "Something went wrong") {
+  return fetch(url).then((response) => {
+    if (!response.ok) throw new Error(`${errorMsg} ${response.status}`);
+    return response.json();
+  });
+};
+
 let getCountryData = (country) => {
   // Country 1
-  fetch(`https://restcountries.com/v3.1/name/${country}`) // The fetch API returns a promise
-    .then((response) => response.json()) // The json API returns a promise as well
+  getJSON(`https://restcountries.com/v3.1/name/${country}`, "Country not found")
     .then((data) => {
       renderCountry(data[0]);
       let neighbour = data[0].borders[0];
-
-      if (!neighbour) return;
-
+      if (!neighbour) throw new Error("No Neighbour found");
       // Country 2
-      return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`);
-
-      // Don't do it (It is just like the callback hell)
-      // return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`).then(
-      // response.json()
-      // )
+      return getJSON(
+        `https://restcountries.com/v3.1/alpha/${neighbour}`,
+        "Country not found"
+      );
     })
-    .then((response) => response.json())
-    .then((data) => renderCountry(data[0], "neighbour"));
+    .then((data) => renderCountry(data[0], "neighbour"))
+    .catch((err) => {
+      renderError(`Something went wrong 😢 ${err.message} Try Again!`);
+    })
+    .finally(() => {
+      countriesContainer.style.opacity = 1;
+    });
 };
 
-getCountryData("bharat");
-// getCountryData("IRELAND");
+getCountryData("AUS");
+//// Handling rejected promises
+btn.addEventListener("click", function () {
+  getCountryData("bharat");
+});
