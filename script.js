@@ -291,8 +291,8 @@ let getCountryData = (country) => {
     });
 };
 
-getCountryData("AUS");
-//// Handling rejected promises
-btn.addEventListener("click", function () {
-  getCountryData("bharat");
-});
+// getCountryData("AUS");
+// //// Handling rejected promises
+// btn.addEventListener("click", function () {
+//   getCountryData("bharat");
+// });
