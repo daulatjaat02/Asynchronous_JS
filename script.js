@@ -233,63 +233,63 @@ const countriesContainer = document.querySelector(".countries");
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-let renderCountry = function (data, className = "") {
-  let html = `
-     <article class="country ${className}">
-          <img class="country__img" src="${data.flags?.png}" />
-          <div class="country__data">
-            <h3 class="country__name">${data.name.common}</h3>
-            <h4 class="country__region">${data.region}</h4>
-            <p class="country__row"><span>👫</span>${(
-              +data.population / 10000000
-            ).toFixed(1)}</p>
-         <p class="country__row"><span>🗣️</span>${Object.values(
-           data.languages
-         ).join(", ")}</p>
-        <p class="country__row"><span>💰</span>${
-          Object.values(data.currencies)[0]?.name
-        }</p>
+// let renderCountry = function (data, className = "") {
+//   let html = `
+//      <article class="country ${className}">
+//           <img class="country__img" src="${data.flags?.png}" />
+//           <div class="country__data">
+//             <h3 class="country__name">${data.name.common}</h3>
+//             <h4 class="country__region">${data.region}</h4>
+//             <p class="country__row"><span>👫</span>${(
+//               +data.population / 10000000
+//             ).toFixed(1)}</p>
+//          <p class="country__row"><span>🗣️</span>${Object.values(
+//            data.languages
+//          ).join(", ")}</p>
+//         <p class="country__row"><span>💰</span>${
+//           Object.values(data.currencies)[0]?.name
+//         }</p>
 
-          </div>
-        </article>
-    `;
-  countriesContainer.insertAdjacentHTML("beforeend", html);
-  // countriesContainer.style.opacity = 1;
-};
+//           </div>
+//         </article>
+//     `;
+//   countriesContainer.insertAdjacentHTML("beforeend", html);
+//   // countriesContainer.style.opacity = 1;
+// };
 
-let renderError = function (err) {
-  countriesContainer.insertAdjacentText("beforeend", err);
-  // countriesContainer.style.opacity = 1;
-};
+// let renderError = function (err) {
+//   countriesContainer.insertAdjacentText("beforeend", err);
+//   // countriesContainer.style.opacity = 1;
+// };
 
-let getJSON = function (url, errorMsg = "Something went wrong") {
-  return fetch(url).then((response) => {
-    if (!response.ok) throw new Error(`${errorMsg} ${response.status}`);
-    return response.json();
-  });
-};
+// let getJSON = function (url, errorMsg = "Something went wrong") {
+//   return fetch(url).then((response) => {
+//     if (!response.ok) throw new Error(`${errorMsg} ${response.status}`);
+//     return response.json();
+//   });
+// };
 
-let getCountryData = (country) => {
-  // Country 1
-  getJSON(`https://restcountries.com/v3.1/name/${country}`, "Country not found")
-    .then((data) => {
-      renderCountry(data[0]);
-      let neighbour = data[0].borders[0];
-      if (!neighbour) throw new Error("No Neighbour found");
-      // Country 2
-      return getJSON(
-        `https://restcountries.com/v3.1/alpha/${neighbour}`,
-        "Country not found"
-      );
-    })
-    .then((data) => renderCountry(data[0], "neighbour"))
-    .catch((err) => {
-      renderError(`Something went wrong 😢 ${err.message} Try Again!`);
-    })
-    .finally(() => {
-      countriesContainer.style.opacity = 1;
-    });
-};
+// let getCountryData = (country) => {
+//   // Country 1
+//   getJSON(`https://restcountries.com/v3.1/name/${country}`, "Country not found")
+//     .then((data) => {
+//       renderCountry(data[0]);
+//       let neighbour = data[0].borders[0];
+//       if (!neighbour) throw new Error("No Neighbour found");
+//       // Country 2
+//       return getJSON(
+//         `https://restcountries.com/v3.1/alpha/${neighbour}`,
+//         "Country not found"
+//       );
+//     })
+//     .then((data) => renderCountry(data[0], "neighbour"))
+//     .catch((err) => {
+//       renderError(`Something went wrong 😢 ${err.message} Try Again!`);
+//     })
+//     .finally(() => {
+//       countriesContainer.style.opacity = 1;
+//     });
+// };
 
 // getCountryData("AUS");
 // //// Handling rejected promises
@@ -305,15 +305,70 @@ let getCountryData = (country) => {
 
 // Event loop
 
-console.log("Test Start");
-setTimeout(() => {
-  console.log("0 Sec Timer");
-}, 0);
-Promise.resolve("Resolve promise 1").then((res) => console.log(res));
+// console.log("Test Start");
+// setTimeout(() => {
+//   console.log("0 Sec Timer");
+// }, 0);
+// Promise.resolve("Resolve promise 1").then((res) => console.log(res));
 
-Promise.resolve("Resolve Promise 2").then((res) => {
-  for (let i = 0; i < 1000000000; i++) {}
-  console.log(res);
+// Promise.resolve("Resolve Promise 2").then((res) => {
+//   for (let i = 0; i < 1000000000; i++) {}
+//   console.log(res);
+// });
+
+// console.log("Test End ");
+
+///////////////////////////////////////////////////////////////////
+
+//// Build a simple promise
+
+let lotteryPromise = new Promise(function (resolve, reject) {
+  console.log("Lottery draw is happening");
+  setTimeout(() => {
+    Math.random() >= 0.5 ? resolve("You won!") : reject(new Error("You lost!"));
+  }, 4000);
 });
 
-console.log("Test End ");
+lotteryPromise
+  .then((res) => console.log(res))
+  .catch((err) => console.error(err));
+
+// Promisifying setTimeout
+let wait = function (seconds) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+wait(2)
+  .then(() => {
+    console.log("1 second passed");
+    return wait(1);
+  })
+  .then(() => {
+    console.log("2 seconds passed");
+    return wait(1);
+  })
+  .then(() => {
+    console.log("3 seconds passed");
+    return wait(1);
+  })
+  .then(() => {
+    console.log("4 seconds passed");
+    return wait(1);
+  })
+  .then(() => {
+    console.log("5 seconds passed");
+    return wait(1);
+  })
+  .then(() => {
+    console.log("6 seconds passed");
+    return wait(1);
+  })
+  .then(() => {
+    console.log("7 seconds passed");
+  });
+
+//
+Promise.resolve("It resolve Immediately").then((x) => console.log(x));
+Promise.reject(new Error("Problem!")).catch((x) => console.log(x));
