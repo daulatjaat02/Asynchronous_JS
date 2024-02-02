@@ -296,3 +296,24 @@ let getCountryData = (country) => {
 // btn.addEventListener("click", function () {
 //   getCountryData("bharat");
 // });
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Asynchronous Behind the Scene
+
+/////////////////////////////////////////////////////////
+
+// Event loop
+
+console.log("Test Start");
+setTimeout(() => {
+  console.log("0 Sec Timer");
+}, 0);
+Promise.resolve("Resolve promise 1").then((res) => console.log(res));
+
+Promise.resolve("Resolve Promise 2").then((res) => {
+  for (let i = 0; i < 1000000000; i++) {}
+  console.log(res);
+});
+
+console.log("Test End ");
